@@ -48,4 +48,4 @@ s3 = boto3.client('s3', aws_access_key_id=access_key, aws_secret_access_key=secr
 
 s3_file = local_filename
 
-s3.upload_file(local_filename, bucket_name, s3_file)
+s3.upload_file(s3_file, bucket_name, s3_file)

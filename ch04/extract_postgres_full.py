@@ -13,11 +13,7 @@ host = parser.get("postgres_config", "host")
 port = parser.get("postgres_config", "port")
 
 conn = psycopg2.connect(
-        "dbname=" + dbname
-        + " user=" + user
-        + " password=" + password
-        + " host=" + host,
-        port = port)
+    f"dbname={dbname} user={user} password={password} host={host}", port=port)
 
 m_query = "SELECT * FROM Orders;"
 local_filename = "order_extract.csv"
@@ -53,7 +49,4 @@ s3 = boto3.client(
 
 s3_file = local_filename
 
-s3.upload_file(
-    local_filename,
-    bucket_name,
-    s3_file)
+s3.upload_file(s3_file, bucket_name, s3_file)

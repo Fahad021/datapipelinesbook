@@ -15,11 +15,7 @@ port = parser.get("aws_creds", "port")
 
 # connect to the redshift cluster
 rs_conn = psycopg2.connect(
-    "dbname=" + dbname
-    + " user=" + user
-    + " password=" + password
-    + " host=" + host
-    + " port=" + port)
+    f"dbname={dbname} user={user} password={password} host={host} port={port}")
 
 rs_sql = """SELECT COALESCE(MAX(LastUpdated), '1900-01-01')
     FROM Orders;"""
@@ -90,7 +86,4 @@ s3 = boto3.client(
 
 s3_file = local_filename
 
-s3.upload_file(
-    local_filename,
-    bucket_name,
-    s3_file)
+s3.upload_file(s3_file, bucket_name, s3_file)

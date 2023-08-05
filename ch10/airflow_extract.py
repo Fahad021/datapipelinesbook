@@ -14,11 +14,8 @@ port = parser.get("aws_creds", "port")
 
 # connect to the redshift cluster
 rs_conn = psycopg2.connect(
-            "dbname=" + dbname
-            + " user=" + user
-            + " password=" + password
-            + " host=" + host
-            + " port=" + port)
+    f"dbname={dbname} user={user} password={password} host={host} port={port}"
+)
 
 rs_sql = """SELECT COALESCE(MAX(id),-1)
             FROM dag_run_history;"""
@@ -40,11 +37,8 @@ password = parser.get("airflowdb_config", "password")
 host = parser.get("airflowdb_config", "host")
 port =  parser.get("airflowdb_config", "port")
 conn = psycopg2.connect(
-        "dbname=" + dbname
-        + " user=" + user
-        + " password=" + password
-        + " host=" + host
-        + " port=" + port)
+    f"dbname={dbname} user={user} password={password} host={host} port={port}"
+)
 
 # get any new DAG runs. ignore running DAGs
 m_query = """SELECT
@@ -90,4 +84,4 @@ s3 = boto3.client(
         aws_access_key_id=access_key,
         aws_secret_access_key=secret_key)
 s3_file = local_filename
-s3.upload_file(local_filename, bucket_name, s3_file)
+s3.upload_file(s3_file, bucket_name, s3_file)

@@ -12,10 +12,9 @@ def connect_to_warehouse():
     host = parser.get("aws_creds", "host")
     port = parser.get("aws_creds", "port")
 
-    # connect to the Redshift cluster
-    rs_conn = psycopg2.connect("dbname=" + dbname + " user=" + user + " password=" + password + " host=" + host + " port=" + port)
-
-    return rs_conn
+    return psycopg2.connect(
+        f"dbname={dbname} user={user} password={password} host={host} port={port}"
+    )
 
 # execute a test made of up two scripts and a comparison operator
 # Returns true/false for test pass/fail
@@ -41,20 +40,20 @@ def execute_test(db_conn, script_1, script_2, comp_operator):
     db_conn.commit()
     cursor.close()
 
-    print("result 1 = " + str(result_1))
-    print("result 2 = " + str(result_2))
+    print(f"result 1 = {str(result_1)}")
+    print(f"result 2 = {str(result_2)}")
 
     # compare values based on the comp_operator
     if comp_operator == "equals":
         return result_1 == result_2
-    elif comp_operator == "greater_equals":
-        return result_1 >= result_2
     elif comp_operator == "greater":
         return result_1 > result_2
-    elif comp_operator == "less_equals":
-        return result_1 <= result_2
+    elif comp_operator == "greater_equals":
+        return result_1 >= result_2
     elif comp_operator == "less":
         return result_1 < result_2
+    elif comp_operator == "less_equals":
+        return result_1 <= result_2
     elif comp_operator == "not_equal":
         return result_1 != result_2
 
@@ -65,9 +64,9 @@ def execute_test(db_conn, script_1, script_2, comp_operator):
 def send_slack_notification(webhook_url, script_1, script_2, comp_operator, test_result):
     try:
         if test_result == True:
-            message = "Validation Test Passed!: " + script_1 + " / " + script_2 + " / " + comp_operator
+            message = f"Validation Test Passed!: {script_1} / {script_2} / {comp_operator}"
         else:
-            message = "Validation Test FAILED!: " + script_1 + " / " + script_2 + " / " + comp_operator
+            message = f"Validation Test FAILED!: {script_1} / {script_2} / {comp_operator}"
 
         slack_data = {'text': message}
         response = requests.post(webhook_url,
@@ -81,7 +80,7 @@ def send_slack_notification(webhook_url, script_1, script_2, comp_operator, test
             return False
     except Exception as e:
         print("error sending slack notification")
-        print(str(e))
+        print(e)
         return False
 
 if __name__ == "__main__":
@@ -114,13 +113,9 @@ if __name__ == "__main__":
     test_result = execute_test(db_conn, script_1, script_2, comp_operator)
 
 
-    print("Result of test: " + str(test_result))
+    print(f"Result of test: {str(test_result)}")
 
-    if test_result == True:
-        exit(0)
+    if test_result != True and sev_level == "halt":
+        exit(-1)
     else:
-        #send_slack_notification(webhook_url, script_1, script_2, comp_operator, test_result)
-        if sev_level == "halt":
-            exit(-1)
-        else:
-            exit(0)
+        exit(0)

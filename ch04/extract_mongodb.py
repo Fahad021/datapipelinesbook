@@ -16,13 +16,8 @@ collection_name = parser.get("mongo_config",
                     "collection")
 
 mongo_client = MongoClient(
-                "mongodb+srv://" + username
-                + ":" + password
-                + "@" + hostname
-                + "/" + database_name
-                + "?retryWrites=true&"
-                + "w=majority&ssl=true&"
-                + "ssl_cert_reqs=CERT_NONE")
+    f"mongodb+srv://{username}:{password}@{hostname}/{database_name}?retryWrites=true&w=majority&ssl=true&ssl_cert_reqs=CERT_NONE"
+)
 
 # connect to the db where the collection resides
 mongo_db = mongo_client[database_name]
@@ -30,7 +25,7 @@ mongo_db = mongo_client[database_name]
 # choose the collection to query documents from
 mongo_collection = mongo_db[collection_name]
 
-start_date = datetime.datetime.today() + timedelta(days = -1)
+start_date = datetime.datetime.now() + timedelta(days = -1)
 end_date = start_date + timedelta(days = 1 )
 
 mongo_query = { "$and":[{"event_timestamp" : { "$gte": start_date }}, {"event_timestamp" : { "$lt": end_date }}] }
@@ -49,11 +44,7 @@ for doc in event_docs:
     event_name = doc.get("event_name", None)
 
     # add all the event properties into a list
-    current_event = []
-    current_event.append(event_id)
-    current_event.append(event_timestamp)
-    current_event.append(event_name)
-
+    current_event = [event_id, event_timestamp, event_name]
     # add the event to the final list of events
     all_events.append(current_event)
 
@@ -81,4 +72,4 @@ s3 = boto3.client('s3',
 
 s3_file = export_file
 
-s3.upload_file(export_file, bucket_name, s3_file)
+s3.upload_file(s3_file, bucket_name, s3_file)

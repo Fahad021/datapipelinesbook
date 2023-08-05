@@ -16,15 +16,7 @@ response_json = json.loads(api_response.content)
 
 all_passes = []
 for response in response_json['response']:
-    current_pass = []
-
-    #store the lat/log from the request
-    current_pass.append(lat)
-    current_pass.append(lon)
-
-    # store the duration and risetime of the pass
-    current_pass.append(response['duration'])
-    current_pass.append(response['risetime'])
+    current_pass = [lat, lon, response['duration'], response['risetime']]
 
     all_passes.append(current_pass)
 

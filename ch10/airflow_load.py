@@ -13,11 +13,8 @@ port = parser.get("aws_creds", "port")
 
 # connect to the redshift cluster
 rs_conn = psycopg2.connect(
-            "dbname=" + dbname
-            + " user=" + user
-            + " password=" + password
-            + " host=" + host
-            + " port=" + port)
+    f"dbname={dbname} user={user} password={password} host={host} port={port}"
+)
 
 # load the account_id and iam_role from the conf files
 parser = configparser.ConfigParser()
@@ -27,18 +24,18 @@ account_id = parser.get(
                 "account_id")
 iam_role = parser.get("aws_creds", "iam_role")
 
-# run the COPY command to ingest into Redshift
-file_path = "s3://bucket-name/dag_run_extract.csv"
-
-sql = """COPY dag_run_history
+sql = (
+    """COPY dag_run_history
         (id,dag_id,execution_date,
         state,run_id,external_trigger,
         end_date,start_date)"""
-sql = sql + " from %s "
-sql = sql + " iam_role 'arn:aws:iam::%s:role/%s';"
+    + " from %s "
+)
+sql += " iam_role 'arn:aws:iam::%s:role/%s';"
 
 # create a cursor object and execute the COPY command
 cur = rs_conn.cursor()
+file_path = "s3://bucket-name/dag_run_extract.csv"
 cur.execute(sql,(file_path, account_id, iam_role))
 
 # close the cursor and commit the transaction

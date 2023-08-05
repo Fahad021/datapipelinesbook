@@ -38,7 +38,7 @@ for binlogevent in b_stream:
             binlogevent,row_event.DeleteRowsEvent
         ):
         event["action"] = "delete"
-        event.update(row["values"].items())
+        event |= row["values"].items()
       elif isinstance(
             binlogevent,row_event.UpdateRowsEvent
         ):
@@ -85,7 +85,4 @@ s3 = boto3.client(
 
 s3_file = local_filename
 
-s3.upload_file(
-    local_filename,
-    bucket_name,
-    s3_file)
+s3.upload_file(s3_file, bucket_name, s3_file)
